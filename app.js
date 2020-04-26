@@ -13,7 +13,21 @@ var express = require('express')
   , locale = require('./lib/locale')
   , request = require('request');
 
+
+var forceSSL = require('express-force-ssl');
+var https = require('https');
+var fs = require('fs');
+
+var ssl_options = {
+  key: fs.readFileSync('./bin/server.key'),
+  cert: fs.readFileSync('./bin/server.crt'),
+  /*ca: fs.readFileSync('./bin/server.ca')*/
+};
+
+
 var app = express();
+
+var secureServer = https.createServer(ssl_options, app);
 
 // bitcoinapi
 bitcoinapi.setWalletDetails(settings.wallet);
@@ -294,5 +308,7 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
+secureServer.listen(443);
 
 module.exports = app;
